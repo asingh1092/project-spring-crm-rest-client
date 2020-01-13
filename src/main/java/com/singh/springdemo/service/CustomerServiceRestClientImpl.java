@@ -19,33 +19,32 @@ public class CustomerServiceRestClientImpl implements CustomerService {
 	private RestTemplate restTemplate;
 
 	private String crmRestUrl;
-		
+
 	private Logger logger = Logger.getLogger(getClass().getName());
-	
+
 	@Autowired
-	public CustomerServiceRestClientImpl(RestTemplate theRestTemplate, 
-										@Value("${crm.rest.url}") String theUrl) {
+	public CustomerServiceRestClientImpl(RestTemplate theRestTemplate, @Value("${crm.rest.url}") String theUrl) {
 		restTemplate = theRestTemplate;
 		crmRestUrl = theUrl;
-				
+
 		logger.info("Loaded property:  crm.rest.url=" + crmRestUrl);
 	}
-	
+
 	@Override
 	public List<Customer> getCustomers() {
-		
+
 		logger.info("in getCustomers(): Calling REST API " + crmRestUrl);
 
 		// make REST call
-		ResponseEntity<List<Customer>> responseEntity = 
-											restTemplate.exchange(crmRestUrl, HttpMethod.GET, null, 
-																  new ParameterizedTypeReference<List<Customer>>() {});
+		ResponseEntity<List<Customer>> responseEntity = restTemplate.exchange(crmRestUrl, HttpMethod.GET, null,
+				new ParameterizedTypeReference<List<Customer>>() {
+				});
 
 		// get the list of customers from response
 		List<Customer> customers = responseEntity.getBody();
 
 		logger.info("in getCustomers(): customers" + customers);
-		
+
 		return customers;
 	}
 
@@ -55,12 +54,10 @@ public class CustomerServiceRestClientImpl implements CustomerService {
 		logger.info("in getCustomer(): Calling REST API " + crmRestUrl);
 
 		// make REST call
-		Customer theCustomer = 
-				restTemplate.getForObject(crmRestUrl + "/" + theId, 
-										  Customer.class);
+		Customer theCustomer = restTemplate.getForObject(crmRestUrl + "/" + theId, Customer.class);
 
 		logger.info("in saveCustomer(): theCustomer=" + theCustomer);
-		
+
 		return theCustomer;
 	}
 
@@ -68,20 +65,20 @@ public class CustomerServiceRestClientImpl implements CustomerService {
 	public void saveCustomer(Customer theCustomer) {
 
 		logger.info("in saveCustomer(): Calling REST API " + crmRestUrl);
-		
+
 		int employeeId = theCustomer.getId();
 
 		// make REST call
 		if (employeeId == 0) {
 			// add employee
-			restTemplate.postForEntity(crmRestUrl, theCustomer, String.class);			
-		
+			restTemplate.postForEntity(crmRestUrl, theCustomer, String.class);
+
 		} else {
 			// update employee
 			restTemplate.put(crmRestUrl, theCustomer);
 		}
 
-		logger.info("in saveCustomer(): success");	
+		logger.info("in saveCustomer(): success");
 	}
 
 	@Override
